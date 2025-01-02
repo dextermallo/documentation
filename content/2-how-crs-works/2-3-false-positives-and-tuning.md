@@ -27,7 +27,7 @@ In an ideal setting, CRS would _allow all valid requests_ and _block all real at
 
 In reality, no system is ideal and CRS will sometimes _block a valid request_ (`False Positive`) or _allow a real attack_ (`False Negative`). Obviously, false negatives are the worse of the two because of the potential repercussions of a successful intrusion.
 
-False positives are particularly likely to happen when operating at higher [paranoia levels]({{% ref "paranoia_levels" %}} "Page describing paranoia levels."). While paranoia level 1 is designed to cause few false positives, higher paranoia levels are increasingly likely to cause false positives. Each successive paranoia level introduces additional rules, with *higher* paranoia levels adding *more aggressive* rules. As such, the higher the paranoia level is, the more likely it is that false positives will occur, and the more time must be invested to tune CRS to reduce false positives. There is no value to a system with a high paranoia level that produces many false positives, as it will likely be unusable by benign clients.
+False positives are particularly likely to happen when operating at higher [paranoia levels]({{% ref "2-2-paranoia_levels" %}} "Page describing paranoia levels."). While paranoia level 1 is designed to cause few false positives, higher paranoia levels are increasingly likely to cause false positives. Each successive paranoia level introduces additional rules, with *higher* paranoia levels adding *more aggressive* rules. As such, the higher the paranoia level is, the more likely it is that false positives will occur, and the more time must be invested to tune CRS to reduce false positives. There is no value to a system with a high paranoia level that produces many false positives, as it will likely be unusable by benign clients.
 
 ### Example False Positive
 
@@ -353,7 +353,7 @@ CRS ships with prebuilt *rule exclusion packages* for a selection of popular web
 
 The packages should be viewed as a good *starting point* from which to build upon. Some false positives may still occur, for example if working at a high paranoia level, if using a very new or old version of the application, if using plug-ins, add-ons, or user customizations.
 
-If using a native CRS installation, rule exclusion packages can be downloaded as [plugins]({{% ref "plugins.md" %}}).
+If using a native CRS installation, rule exclusion packages can be downloaded as [plugins]({{% ref "4-1-plugins.md" %}}).
 
 If running CRS where it has been integrated into a commercial product or CDN then support varies. Some vendors expose rule exclusion packages in the GUI while other vendors require custom rules to be written which set the necessary variables. Unfortunately, there are also vendors that don't allow rule exclusion packages to be used at all.
 
