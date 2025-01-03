@@ -94,6 +94,16 @@ Other aspects of ModSecurity, particularly engine-specific parameters, are contr
 
 In many scenarios, the default example CRS configuration will be a good enough starting point. It is, however, a good idea to take the time to look through the example configuration file *before* deploying it to make sure it's right for a given environment.
 
+{{% notice warning %}}
+In particular, _Response_ rules are enabled by default. You must be aware that you may be vulnerable to RFDoS attacks, depending on the responses your application is sending back to the client. You could be vulnerable, if your responses from your application can contain user input. If an attacker can submit user input that is returned as part of a response, the attacker can craft the input in such a way that the response rules of the WAF will block responses containing that input _for all_ clients. For example, a blog post might no longer be accessible because of the contents of a comment on the post. See [this blog post](https://blog.sicuranext.com/response-filter-denial-of-service-a-new-way-to-shutdown-a-website/) about the problems you could face.
+There is an [experimental scanner](https://github.com/edoardottt/RFDos-Scanner) that uses [nuclei](https://github.com/projectdiscovery/nuclei?tab=readme-ov-file#install-nuclei) to find out if are affected. So if
+you are unsure, first test your application before enabling the response rules, or risk accidentally blocking some valid responses.
+Response rules can be easily disabled by uncommenting the rule with id `900500` in the `crs-setup.conf` file,
+since CRS version 4.10.0.
+
+**The CRS team believes that the damage that can be caused by webshells and information leakage outweighs the damage of RFDos attacks, in general. Thus, the response rules remain active in the default configuration for now.**
+{{% /notice %}}
+
 Once any settings have been changed within the example configuration file, as needed, it should be renamed to remove the .example portion, like so:
 
 ```bash
@@ -121,19 +131,21 @@ systemctl restart httpd.service
 
 ## Alternative: Using Containers
 
-Another quick option is to use the official CRS [pre-packaged containers]({{% ref "../development/useful_tools/#official-crs-maintained-docker-images" %}}). Docker, Podman, or any compatible container engine can be used. The official CRS images are published in the Docker Hub. The image most often deployed is `owasp/modsecurity-crs`: it already has everything needed to get up and running quickly.
+Another quick option is to use the official CRS [pre-packaged containers]({{% ref "../development/useful_tools/#official-crs-maintained-docker-images" %}}). Docker, Podman, or any compatible container engine can be used. The official CRS images are published on [Docker Hub](https://hub.docker.com/r/owasp/modsecurity-crs/) and [GitHub Container Repository](https://github.com/coreruleset/modsecurity-crs-docker/pkgs/container/modsecurity-crs). The image most often deployed is `modsecurity-crs` (`owasp/modsecurity-crs` from Docker Hub or `ghcr.io/coreruleset/modsecurity-crs` from GHCR): it already has everything needed to get up and running quickly.
 
 The CRS project pre-packages both Apache and Nginx web servers along with the appropriate corresponding ModSecurity engine. More engines, like [Coraza](https://coraza.io/), will be added at a later date.
 
 To protect a running web server, all that's required is to get the appropriate image and set its configuration variables to make the WAF receives requests and proxies them to your backend server.
 
-Below is an example `docker-compose` file that can be used to pull the container images. All that needs to be changed is the `BACKEND` variable so that the WAF points to the backend server in question:
+Below is an example docker _compose_ file that can be used to pull the container images. If you don't have compose installed, please read the [installation instructions](https://docs.docker.com/compose/install/). All that needs to be changed is the `BACKEND` variable so that the WAF points to the backend server in question:
 
 ```docker-compose
 services:
   modsec2-apache:
     container_name: modsec2-apache
     image: owasp/modsecurity-crs:apache
+    # if you are using Linux, you will need to uncomment the below line
+    # user: root
     environment:
       SERVERNAME: modsec2-apache
       BACKEND: http://<backend server>
